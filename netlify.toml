@@ -1,16 +1,6 @@
-# netlify.toml - versi siap pakai untuk chatbot AI
 [build]
-  # Folder publish = root folder tempat index.html berada
   publish = "."
-  # Folder functions untuk serverless function
   functions = "netlify/functions"
 
-[functions]
-  # Bundler untuk Netlify Function
-  node_bundler = "esbuild"
-
-# Redirect semua rute ke index.html (optional, untuk SPA)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[dev]
+  functions = "netlify/functions"
