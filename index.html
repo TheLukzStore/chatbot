@@ -3,120 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Chatbot - TheLukz</title>
+  <title>🤖 AI Chatbot - TheLukz</title>
   <style>
-    body {
-      background: #1a1a1a;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    #chatbox {
-      width: 90%;
-      max-width: 400px;
-      height: 70vh;
-      background: #2b2b2b;
-      border-radius: 10px;
-      padding: 10px;
-      overflow-y: auto;
-      box-shadow: 0 0 10px #000;
-    }
-    .message {
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 8px;
-      max-width: 80%;
-      word-wrap: break-word;
-    }
-    .user {
-      background: #0078ff;
-      align-self: flex-end;
-      margin-left: auto;
-    }
-    .bot {
-      background: #333;
-      align-self: flex-start;
-      margin-right: auto;
-    }
-    #input-area {
-      display: flex;
-      width: 90%;
-      max-width: 400px;
-      margin-top: 10px;
-    }
-    input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px 0 0 8px;
-      outline: none;
-    }
-    button {
-      padding: 10px 20px;
-      border: none;
-      background: #0078ff;
-      color: white;
-      border-radius: 0 8px 8px 0;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #005fcc;
-    }
+    body { font-family: sans-serif; background:#1e1e1e; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+    #chat { width: 90%; max-width: 500px; border: 1px solid #444; border-radius:8px; padding:10px; background:#2b2b2b; overflow-y:auto; height:400px; }
+    .message { margin:5px 0; }
+    .user { color:#4fc3f7; }
+    .bot { color:#ffb74d; }
+    input { width:80%; padding:10px; border-radius:4px; border:none; margin-right:5px; }
+    button { padding:10px; border:none; border-radius:4px; background:#4fc3f7; color:#000; cursor:pointer; }
   </style>
 </head>
 <body>
-  <h2>🤖 AI Chatbot - TheLukz</h2>
-  <div id="chatbox"></div>
-  <div id="input-area">
-    <input id="user-input" type="text" placeholder="Ketik pesan..." />
-    <button id="send-btn">Kirim</button>
+  <h1>🤖 AI Chatbot - TheLukz</h1>
+  <div id="chat"></div>
+  <div style="margin-top:10px;">
+    <input type="text" id="message" placeholder="Ketik pesan..." />
+    <button onclick="sendMessage()">Kirim</button>
   </div>
 
   <script>
-    const chatbox = document.getElementById("chatbox");
-    const input = document.getElementById("user-input");
-    const sendBtn = document.getElementById("send-btn");
-
-    function appendMessage(sender, text) {
-      const msg = document.createElement("div");
-      msg.className = `message ${sender}`;
-      msg.innerText = text;
-      chatbox.appendChild(msg);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
+    const chatDiv = document.getElementById('chat');
 
     async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
-      appendMessage("user", text);
-      input.value = "";
-
-      appendMessage("bot", "⏳ Sedang berpikir...");
+      const input = document.getElementById('message');
+      const msg = input.value.trim();
+      if (!msg) return;
+      addMessage(msg, 'user');
+      input.value = '';
 
       try {
-        const res = await fetch("/.netlify/functions/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text }),
+        const res = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg })
         });
-
         const data = await res.json();
-        const botReply = data.reply || "Tidak ada respon.";
-        document.querySelector(".bot:last-child").innerText = botReply;
+        addMessage(data.reply, 'bot');
       } catch (err) {
-        document.querySelector(".bot:last-child").innerText = "⚠️ Gagal menghubungi server.";
+        addMessage('⚠️ Gagal mengirim pesan.', 'bot');
       }
     }
 
-    sendBtn.addEventListener("click", sendMessage);
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
+    function addMessage(msg, sender) {
+      const p = document.createElement('div');
+      p.className = 'message ' + sender;
+      p.textContent = msg;
+      chatDiv.appendChild(p);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
   </script>
 </body>
 </html>
