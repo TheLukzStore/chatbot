@@ -1,19 +1,21 @@
-import fetch from "node-fetch";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // aman, disimpan di environment
+});
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Hanya POST yang diizinkan." });
+  const { message } = req.body;
+
+  try {
+    const completion = await client.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: message }],
+    });
+
+    const reply = completion.choices[0].message.content;
+    res.status(200).json({ reply });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal menghubungi OpenAI: " + error.message });
   }
-
-  const body = req.body;
-  const userMessage = body?.message || "";
-
-  console.log("Pesan diterima:", userMessage);
-
-  // Contoh tanpa OpenAI (bisa diganti nanti)
-  let reply = "Maaf, saya tidak tahu cara menjawab itu.";
-  if (userMessage.toLowerCase().includes("halo")) reply = "Hai juga! Ada yang bisa saya bantu?";
-  if (userMessage.toLowerCase().includes("nama")) reply = "Saya TheLukz Bot 🤖";
-
-  return res.status(200).json({ reply });
 }
